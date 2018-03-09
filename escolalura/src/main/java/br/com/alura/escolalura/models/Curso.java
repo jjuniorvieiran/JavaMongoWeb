@@ -4,8 +4,12 @@ public class Curso {
 
 	private String nome;
 
+	public Curso() {
+
+	}
+
 	public Curso(String nome) {
-		this.nome= nome;
+		this.nome = nome;
 	}
 
 	public String getNome() {
@@ -15,7 +19,5 @@ public class Curso {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-	
-	
-	
+
 }
