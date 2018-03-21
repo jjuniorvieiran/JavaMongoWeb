@@ -18,6 +18,7 @@ import org.bson.types.ObjectId;
 import br.com.alura.escolalura.models.Aluno;
 import br.com.alura.escolalura.models.Curso;
 import br.com.alura.escolalura.models.Habilidade;
+import br.com.alura.escolalura.models.Nota;
 
 public class AlunoCodec implements CollectibleCodec<Aluno> {
 
@@ -34,12 +35,13 @@ public class AlunoCodec implements CollectibleCodec<Aluno> {
 		Date dataNascimento = aluno.getDataNascimento();
 		Curso curso = aluno.getCurso();
 		List<Habilidade> habilidades = aluno.getHabilidades();
+		List<Nota> notas = aluno.getNotas();
 
-		Document documento = new Document();
-		documento.put("_id", id);
-		documento.put("nome", nome);
-		documento.put("data_nascimento", dataNascimento);
-		documento.put("curso", new Document("nome", curso.getNome()));
+		Document document = new Document();
+		document.put("_id", id);
+		document.put("nome", nome);
+		document.put("data_nascimento", dataNascimento);
+		document.put("curso", new Document("nome", curso.getNome()));
 
 		if (habilidades != null) {
 			List<Document> habilidadesDocument = new ArrayList<>();
@@ -47,10 +49,18 @@ public class AlunoCodec implements CollectibleCodec<Aluno> {
 				habilidadesDocument.add(new Document("nome", habilidade
 						.getNome()).append("nivel", habilidade.getNivel()));
 			}
-			documento.put("habilidades", habilidadesDocument);
+			document.put("habilidades", habilidadesDocument);
 		}
-
-		codec.encode(writer, documento, encoder);
+		
+		if (notas != null) {
+			List<Double> notasParaSalvar = new ArrayList<>();
+			for (Nota nota : notas) {
+				notasParaSalvar.add(nota.getValor());
+			}
+			document.put("notas", notasParaSalvar);
+		} 
+ 
+		codec.encode(writer, document, encoder);
 
 	}
 
@@ -67,12 +77,36 @@ public class AlunoCodec implements CollectibleCodec<Aluno> {
 		aluno.setId(document.getObjectId("_id"));
 		aluno.setNome(document.getString("nome"));
 		aluno.setDataNascimento(document.getDate("data_nascimento"));
+		
 		Document curso = (Document) document.get("curso");
-
 		if (curso != null) {
 			String nomeCurso = curso.getString("nome");
 			aluno.setCurso(new Curso(nomeCurso));
 		}
+		
+		
+		List<Double> notas = (List<Double>) document.get("notas");
+		if (notas != null) {
+		  List<Nota> notasDoAluno = new ArrayList<>();
+		  for (Double nota : notas) {
+		    notasDoAluno.add(new Nota(nota));
+		    aluno.setNotas(notasDoAluno);
+		  }
+		}
+
+		List<Document> habilidades = (List<Document>) document.get("habilidades");
+		if(habilidades != null) {  
+		  List<Habilidade> habilidadesDoAluno = new ArrayList<>();
+		  for (Document documentHabilidade : habilidades) {
+		    habilidadesDoAluno.add(new Habilidade(documentHabilidade.getString("nome"), documentHabilidade.getString("nivel")));
+		  }
+		  aluno.setHabilidades(habilidadesDoAluno);
+		}
+		// código omitido
+		
+		
+		
+		
 
 		return aluno;
 	}
