@@ -14,6 +14,8 @@ public class Aluno {
 	private Curso curso;
 	private List<Nota> notas;
 	private List<Habilidade> habilidades;
+	
+	private Contato contato;
 
 	public ObjectId getId() {
 		return id;
@@ -88,4 +90,11 @@ public class Aluno {
 		return aluno;
 	}
 
+	public Contato getContato() {
+		return contato;
+	}
+
+	public void setContato(Contato contato) {
+		this.contato = contato;
+	}
 }
